@@ -126,7 +126,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     >
                       <item.icon className="h-5 w-5" />
                       {item.label}
-                      {badge && <Badge className="ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full">{item.badge}</Badge>}
+                      {item.badge && <Badge className="ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full">{item.badge}</Badge>}
                     </Link>
                 ))}
               </nav>

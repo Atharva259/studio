@@ -21,13 +21,13 @@ const regions = [
         title: "Maharashtra - The Orchard State",
         description: "A leading producer of fruits like mangoes, grapes, and bananas. The state's diverse agro-climatic zones also support major crops like sugarcane, cotton, and onions.",
         keyCrops: "Sugarcane, Grapes, Mangoes",
-        image: null,
+        image: PlaceHolderImages.find((img) => img.id === 'tour-maharashtra'),
     },
      {
         title: "Gujarat - The Cotton Belt",
         description: "Gujarat is the largest producer of cotton in India. It's also a major producer of groundnuts, castor seeds, and other cash crops, supported by innovative irrigation like the Sardar Sarovar Project.",
         keyCrops: "Cotton, Groundnuts, Castor",
-        image: null,
+        image: PlaceHolderImages.find((img) => img.id === 'tour-gujarat'),
     }
 ];
 

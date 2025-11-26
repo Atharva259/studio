@@ -21,13 +21,13 @@ const technologies = [
         title: "AI-Powered Soil Sensors",
         description: "Get detailed insights into your soil's health, including NPK values, pH, and moisture levels. Make data-driven decisions for fertilizer application and soil treatment.",
         company: "TerraIntel Labs",
-        image: null,
+        image: PlaceHolderImages.find((img) => img.id === 'tech-sensors'),
     },
      {
         title: "Automated Weeders",
         description: "Robotic weeders that use computer vision to identify and remove weeds without harming crops, reducing the need for manual labor and herbicides.",
         company: "FarmBotics India",
-        image: null,
+        image: PlaceHolderImages.find((img) => img.id === 'tech-weeder'),
     }
 ];
 

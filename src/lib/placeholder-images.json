@@ -47,6 +47,30 @@
       "description": "A portrait of a smiling farmer.",
       "imageUrl": "https://images.unsplash.com/photo-1618496899001-b58ebcbeef26?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxmYXJtZXIlMjBwb3J0cmFpdHxlbnwwfHx8fDE3NjQxNzg3NTJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
       "imageHint": "farmer portrait"
+    },
+    {
+      "id": "tech-sensors",
+      "description": "Close-up of a smart soil sensor in the ground.",
+      "imageUrl": "https://images.unsplash.com/photo-1644781037731-205167e81191?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxzb2lsJTIwc2Vuc29yfGVufDB8fHx8MTc2NTM4MTU3N3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "soil sensor"
+    },
+    {
+      "id": "tech-weeder",
+      "description": "An autonomous weeding robot in a vegetable field.",
+      "imageUrl": "https://images.unsplash.com/photo-1667794358673-959960714777?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxyb2JvdCUyMHdlZWRpbmd8ZW58MHx8fHwxNzY1MzgxNTc3fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "robot weeder"
+    },
+    {
+      "id": "tour-maharashtra",
+      "description": "A lush vineyard with rows of grapevines in Maharashtra.",
+      "imageUrl": "https://images.unsplash.com/photo-1596397652930-b45b0848a602?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxncmFwZSUyMHZpbmV5YXJkJTIwaW5kaWF8ZW58MHx8fHwxNzY1MzgxNTc3fDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "grape vineyard"
+    },
+    {
+      "id": "tour-gujarat",
+      "description": "A field of mature cotton plants ready for harvest.",
+      "imageUrl": "https://images.unsplash.com/photo-1628162237346-a51b32a6f504?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHxjb3R0b24lMjBmaWVsZHxlbnwwfHx8fDE3NjUzODE1Nzd8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "cotton field"
     }
   ]
 }

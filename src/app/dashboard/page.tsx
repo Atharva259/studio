@@ -7,6 +7,7 @@ import { VoiceAssistantCard } from "@/components/dashboard/voice-assistant-card"
 import { FertilizerCard } from "@/components/dashboard/fertilizer-card";
 import { OfflineRecommendationsCard } from "@/components/dashboard/offline-recommendations-card";
 import Link from "next/link";
+import { PestControlCard } from "@/components/dashboard/pest-control-card";
 
 export default function Dashboard() {
   return (
@@ -22,10 +23,11 @@ export default function Dashboard() {
           </Link>
         </Button>
       </div>
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         <InteractiveFarm />
         <WeatherCard />
         <NextBestActionCard />
+        <PestControlCard />
         <OfflineRecommendationsCard />
         <VoiceAssistantCard />
         <FertilizerCard />

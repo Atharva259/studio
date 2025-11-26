@@ -1,3 +1,52 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "login-background",
+      "description": "A beautiful farm landscape at sunrise.",
+      "imageUrl": "https://images.unsplash.com/photo-1543051932-6ef9fecfbc80?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw3fHxmYXJtJTIwbGFuZHNjYXBlfGVufDB8fHx8MTc2NDE1MDgyNnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "farm landscape"
+    },
+    {
+      "id": "farm-visual",
+      "description": "An aerial view of a farm plot.",
+      "imageUrl": "https://images.unsplash.com/photo-1624841934400-6abf1c91625b?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw1fHxhZXJpYWwlMjBmYXJtfGVufDB8fHx8MTc2NDE3ODc1Mnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "aerial farm"
+    },
+    {
+      "id": "weather-map",
+      "description": "A map showing weather patterns over a region.",
+      "imageUrl": "https://images.unsplash.com/photo-1578403881967-084f9885be74?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHx3ZWF0aGVyJTIwbWFwfGVufDB8fHx8MTc2NDE2NTE5M3ww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "weather map"
+    },
+    {
+      "id": "tech-drone",
+      "description": "A drone spraying crops in a field.",
+      "imageUrl": "https://images.unsplash.com/photo-1605147862555-f392622d9bbb?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxMHx8ZmFybSUyMGRyb25lfGVufDB8fHx8MTc2NDE3ODc1Mnww&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "farm drone"
+    },
+    {
+      "id": "tech-irrigation",
+      "description": "A smart irrigation system watering a field.",
+      "imageUrl": "https://images.unsplash.com/photo-1743710291059-792b4c3706ea?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw4fHxzbWFydCUyMGlycmlnYXRpb258ZW58MHx8fHwxNzY0MTc4NzUyfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "smart irrigation"
+    },
+    {
+      "id": "tour-punjab",
+      "description": "Lush green wheat fields in Punjab, India.",
+      "imageUrl": "https://images.unsplash.com/photo-1529511582893-2d7e684dd128?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwxfHx3aGVhdCUyMGZpZWxkc3xlbnwwfHx8fDE3NjQxNzg3NTJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "wheat fields"
+    },
+    {
+      "id": "tour-kerala",
+      "description": "A spice plantation in Kerala, India.",
+      "imageUrl": "https://images.unsplash.com/photo-1760284592626-27a0b458d929?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHwzfHxzcGljZSUyMHBsYW50YXRpb258ZW58MHx8fHwxNzY0MTc4NzUyfDA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "spice plantation"
+    },
+    {
+      "id": "user-avatar",
+      "description": "A portrait of a smiling farmer.",
+      "imageUrl": "https://images.unsplash.com/photo-1618496899001-b58ebcbeef26?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3NDE5ODJ8MHwxfHNlYXJjaHw2fHxmYXJtZXIlMjBwb3J0cmFpdHxlbnwwfHx8fDE3NjQxNzg3NTJ8MA&ixlib=rb-4.1.0&q=80&w=1080",
+      "imageHint": "farmer portrait"
+    }
+  ]
 }

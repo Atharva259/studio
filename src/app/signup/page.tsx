@@ -12,18 +12,21 @@ import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { useAuth, useUser, initiateEmailSignUp } from '@/firebase';
-
+import { useToast } from '@/hooks/use-toast';
+import { FirebaseError } from 'firebase/app';
 
 export default function SignupPage() {
   const router = useRouter();
   const auth = useAuth();
+  const { toast } = useToast();
   const { user, isUserLoading } = useUser();
   const loginImage = PlaceHolderImages.find((img) => img.id === 'login-background');
-  
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [fullName, setFullName] = useState('');
   const [role, setRole] = useState('farmer');
+  const [isSigningUp, setIsSigningUp] = useState(false);
 
   useEffect(() => {
     if (!isUserLoading && user) {
@@ -31,9 +34,35 @@ export default function SignupPage() {
     }
   }, [user, isUserLoading, router]);
 
-  const handleSignup = (e: React.FormEvent) => {
+  const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
-    initiateEmailSignUp(auth, email, password);
+    setIsSigningUp(true);
+    try {
+      await initiateEmailSignUp(auth, email, password);
+      // On success, onAuthStateChanged listener in FirebaseProvider will set user,
+      // and the useEffect above will redirect to the dashboard.
+    } catch (error) {
+      let description = 'An unexpected error occurred. Please try again.';
+      if (error instanceof FirebaseError) {
+        switch (error.code) {
+          case 'auth/email-already-in-use':
+            description = 'This email is already in use. Please try logging in.';
+            break;
+          case 'auth/weak-password':
+            description = 'The password is too weak. It must be at least 6 characters long.';
+            break;
+          default:
+            description = error.message;
+        }
+      }
+      toast({
+        variant: 'destructive',
+        title: 'Sign-up Failed',
+        description,
+      });
+    } finally {
+      setIsSigningUp(false);
+    }
   };
 
   if (isUserLoading || (!isUserLoading && user)) {
@@ -71,15 +100,34 @@ export default function SignupPage() {
             <div className="grid gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="full-name">Full Name</Label>
-                <Input id="full-name" placeholder="Ram Singh" required value={fullName} onChange={e => setFullName(e.target.value)} />
+                <Input
+                  id="full-name"
+                  placeholder="Ram Singh"
+                  required
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
+                />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" placeholder="farmer@example.com" required value={email} onChange={e => setEmail(e.target.value)} />
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="farmer@example.com"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
               </div>
               <div className="grid gap-2">
                 <Label htmlFor="password">Password</Label>
-                <Input id="password" type="password" required value={password} onChange={e => setPassword(e.target.value)} />
+                <Input
+                  id="password"
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
               </div>
               <div className="grid gap-2">
                 <Label>I am a...</Label>
@@ -94,8 +142,13 @@ export default function SignupPage() {
                   </div>
                 </RadioGroup>
               </div>
-              <Button type="submit" className="w-full font-bold" disabled={isUserLoading}>
-                {isUserLoading ? <Loader2 className="animate-spin" /> : 'Create Account'} <ArrowRight className="ml-2 h-4 w-4" />
+              <Button type="submit" className="w-full font-bold" disabled={isUserLoading || isSigningUp}>
+                {isUserLoading || isSigningUp ? (
+                  <Loader2 className="animate-spin" />
+                ) : (
+                  'Create Account'
+                )}{' '}
+                <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </div>
           </form>

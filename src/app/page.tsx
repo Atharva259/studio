@@ -7,22 +7,25 @@ import { Tractor, ArrowRight, Loader2 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
 
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { useAuth, useUser, initiateEmailSignIn } from '@/firebase';
+import { useToast } from '@/hooks/use-toast';
+import { FirebaseError } from 'firebase/app';
 
 export default function LoginPage() {
   const router = useRouter();
   const auth = useAuth();
+  const { toast } = useToast();
   const { user, isUserLoading } = useUser();
   const loginImage = PlaceHolderImages.find((img) => img.id === 'login-background');
-  
+
   const [email, setEmail] = useState('farmer@kisanmate.com');
   const [password, setPassword] = useState('password');
   const [role, setRole] = useState('farmer');
+  const [isLoggingIn, setIsLoggingIn] = useState(false);
 
   useEffect(() => {
     if (!isUserLoading && user) {
@@ -30,9 +33,30 @@ export default function LoginPage() {
     }
   }, [user, isUserLoading, router]);
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    initiateEmailSignIn(auth, email, password);
+    setIsLoggingIn(true);
+    try {
+      await initiateEmailSignIn(auth, email, password);
+      // On success, onAuthStateChanged listener in FirebaseProvider will set user,
+      // and the useEffect above will redirect to the dashboard.
+    } catch (error) {
+      if (error instanceof FirebaseError && error.code === 'auth/invalid-credential') {
+        toast({
+          variant: 'destructive',
+          title: 'Login Failed',
+          description: 'Invalid credentials. Please check your email and password.',
+        });
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'Login Failed',
+          description: 'An unexpected error occurred. Please try again.',
+        });
+      }
+    } finally {
+      setIsLoggingIn(false);
+    }
   };
 
   if (isUserLoading || (!isUserLoading && user)) {
@@ -58,7 +82,14 @@ export default function LoginPage() {
             <div className="grid gap-4">
               <div className="grid gap-2">
                 <Label htmlFor="email">Email</Label>
-                <Input id="email" type="email" placeholder="farmer@example.com" required value={email} onChange={(e) => setEmail(e.target.value)} />
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="farmer@example.com"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                />
               </div>
               <div className="grid gap-2">
                 <div className="flex items-center">
@@ -67,7 +98,13 @@ export default function LoginPage() {
                     Forgot your password?
                   </Link>
                 </div>
-                <Input id="password" type="password" required value={password} onChange={(e) => setPassword(e.target.value)} />
+                <Input
+                  id="password"
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                />
               </div>
               <div className="grid gap-2">
                 <Label>Role</Label>
@@ -82,8 +119,13 @@ export default function LoginPage() {
                   </div>
                 </RadioGroup>
               </div>
-              <Button type="submit" className="w-full font-bold" disabled={isUserLoading}>
-                {isUserLoading ? <Loader2 className="animate-spin" /> : 'Login'} <ArrowRight className="ml-2 h-4 w-4" />
+              <Button type="submit" className="w-full font-bold" disabled={isUserLoading || isLoggingIn}>
+                {isUserLoading || isLoggingIn ? (
+                  <Loader2 className="animate-spin" />
+                ) : (
+                  'Login'
+                )}{' '}
+                <ArrowRight className="ml-2 h-4 w-4" />
               </Button>
             </div>
           </form>

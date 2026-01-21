@@ -12,19 +12,18 @@ import {
   Home,
   LayoutDashboard,
   LogOut,
+  Map,
   Menu,
   Search,
   Settings,
   Sprout,
   Store,
   Tractor,
-  Truck,
   Loader2,
 } from 'lucide-react';
 
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -36,16 +35,15 @@ import {
 import { Input } from '@/components/ui/input';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { cn } from '@/lib/utils';
-import { PlaceHolderImages } from '@/lib/placeholder-images';
 import { useAuth, useUser } from '@/firebase';
 import { useEffect } from 'react';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
   const auth = useAuth();
   const { user, isUserLoading } = useUser();
-  const avatarImage = PlaceHolderImages.find((img) => img.id === 'user-avatar');
 
   useEffect(() => {
     if (!isUserLoading && !user) {
@@ -67,12 +65,13 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   const navItems = [
     { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-    { href: '/dashboard/shipments', icon: Truck, label: 'Shipments', badge: '6' },
+    { href: '/dashboard/my-farm', icon: Home, label: 'My Farm' },
     { href: '/dashboard/crop-planner', icon: Sprout, label: 'Crop Planner' },
     { href: '/dashboard/marketplace', icon: Store, label: 'Marketplace' },
     { href: '/dashboard/tech-hub', icon: Cpu, label: 'Tech Hub' },
     { href: '/dashboard/tour-india', icon: Globe, label: 'Tour India' },
     { href: '/dashboard/chatbot', icon: Bot, label: 'AI Chatbot' },
+    { href: 'https://www.google.com/maps/search/?api=1&query=nearby+soil+laboratories', icon: Map, label: 'Nearby Labs', external: true },
   ];
 
   const NavLink = ({ href, icon: Icon, label, badge }: (typeof navItems)[0]) => (
@@ -105,23 +104,23 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           </div>
           <div className="flex-1">
             <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
-              {navItems.map((item) => (
-                <NavLink key={item.href} {...item} />
-              ))}
+              {navItems.map((item) =>
+                item.external ? (
+                  <a
+                    key={item.href}
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-3 rounded-lg px-3 py-2 text-muted-foreground transition-all hover:text-primary"
+                  >
+                    <item.icon className="h-4 w-4" />
+                    {item.label}
+                  </a>
+                ) : (
+                  <NavLink key={item.href} {...item} />
+                )
+              )}
             </nav>
-          </div>
-          <div className="mt-auto p-4">
-            <Card>
-              <CardHeader className="p-2 pt-0 md:p-4">
-                <CardTitle>Upgrade to Pro</CardTitle>
-                <CardDescription>Unlock all features and get unlimited access to our support team.</CardDescription>
-              </CardHeader>
-              <CardContent className="p-2 pt-0 md:p-4 md:pt-0">
-                <Button size="sm" className="w-full">
-                  Upgrade
-                </Button>
-              </CardContent>
-            </Card>
           </div>
         </div>
       </div>
@@ -140,7 +139,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                   <Tractor className="h-6 w-6 text-primary" />
                   <span className="font-headline text-xl">KisanMate Pro</span>
                 </Link>
-                {navItems.map((item) => (
+                {navItems.map((item) =>
+                  item.external ? (
+                     <a
+                      key={item.href}
+                      href={item.href}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mx-[-0.65rem] flex items-center gap-4 rounded-xl px-3 py-2 text-muted-foreground hover:text-foreground"
+                    >
+                      <item.icon className="h-5 w-5" />
+                      {item.label}
+                    </a>
+                  ) : (
                    <Link
                       key={item.href}
                       href={item.href}
@@ -152,21 +163,9 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                       {item.label}
                       {item.badge && <Badge className="ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full">{item.badge}</Badge>}
                     </Link>
-                ))}
+                  )
+                )}
               </nav>
-              <div className="mt-auto">
-                <Card>
-                  <CardHeader>
-                    <CardTitle>Upgrade to Pro</CardTitle>
-                    <CardDescription>Unlock all features and get unlimited access to our support team.</CardDescription>
-                  </CardHeader>
-                  <CardContent>
-                    <Button size="sm" className="w-full">
-                      Upgrade
-                    </Button>
-                  </CardContent>
-                </Card>
-              </div>
             </SheetContent>
           </Sheet>
           <div className="w-full flex-1">
@@ -184,11 +183,10 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="secondary" size="icon" className="rounded-full">
-                {avatarImage ? (
-                   <Image src={user.photoURL || avatarImage.imageUrl} width={36} height={36} alt="User Avatar" className="rounded-full" data-ai-hint={avatarImage.imageHint}/>
-                ) : (
-                  <CircleUser className="h-5 w-5" />
-                )}
+                <Avatar className="h-9 w-9">
+                  <AvatarImage src={user.photoURL ?? undefined} alt={user.displayName ?? 'User'} />
+                  <AvatarFallback>{user.displayName?.charAt(0).toUpperCase() || user.email?.charAt(0).toUpperCase()}</AvatarFallback>
+                </Avatar>
                 <span className="sr-only">Toggle user menu</span>
               </Button>
             </DropdownMenuTrigger>

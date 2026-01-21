@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Tractor, ArrowRight, Loader2 } from 'lucide-react';
 import React, { useState, useEffect } from 'react';
+import { updateProfile } from 'firebase/auth';
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -36,9 +37,20 @@ export default function SignupPage() {
 
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!fullName) {
+      toast({
+        variant: 'destructive',
+        title: 'Sign-up Failed',
+        description: 'Please enter your full name.',
+      });
+      return;
+    }
     setIsSigningUp(true);
     try {
-      await initiateEmailSignUp(auth, email, password);
+      const userCredential = await initiateEmailSignUp(auth, email, password);
+      await updateProfile(userCredential.user, {
+        displayName: fullName,
+      });
       // On success, onAuthStateChanged listener in FirebaseProvider will set user,
       // and the useEffect above will redirect to the dashboard.
     } catch (error) {

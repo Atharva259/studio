@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { PageHeader } from '@/components/page-header';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { Button } from '@/components/ui/button';
@@ -19,6 +19,15 @@ export default function ChatbotPage() {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages, loading]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,53 +60,56 @@ export default function ChatbotPage() {
         description="Ask me anything about farming, crop management, or market trends."
       />
       <div className="flex-grow flex flex-col bg-card border rounded-lg">
-        <ScrollArea className="flex-grow p-4 space-y-4">
-          {messages.length === 0 && (
-            <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
-              <Bot className="h-12 w-12 mb-4" />
-              <p>Start the conversation by asking a question below.</p>
-            </div>
-          )}
-          {messages.map((message, index) => (
-            <div
-              key={index}
-              className={cn(
-                'flex items-start gap-4',
-                message.role === 'user' ? 'justify-end' : ''
-              )}
-            >
-              {message.role === 'assistant' && (
-                <Avatar className="h-8 w-8 bg-primary text-primary-foreground">
-                  <AvatarFallback><Bot className="h-5 w-5"/></AvatarFallback>
-                </Avatar>
-              )}
+        <ScrollArea className="flex-grow p-4">
+          <div className="space-y-4">
+            {messages.length === 0 && (
+              <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground pt-24">
+                <Bot className="h-12 w-12 mb-4" />
+                <p>Start the conversation by asking a question below.</p>
+              </div>
+            )}
+            {messages.map((message, index) => (
               <div
+                key={index}
                 className={cn(
-                  'max-w-md rounded-lg p-3 text-sm',
-                  message.role === 'user'
-                    ? 'bg-primary text-primary-foreground'
-                    : 'bg-muted'
+                  'flex items-start gap-4',
+                  message.role === 'user' ? 'justify-end' : ''
                 )}
               >
-                <p className="whitespace-pre-wrap">{message.content}</p>
+                {message.role === 'assistant' && (
+                  <Avatar className="h-8 w-8 bg-primary text-primary-foreground">
+                    <AvatarFallback><Bot className="h-5 w-5"/></AvatarFallback>
+                  </Avatar>
+                )}
+                <div
+                  className={cn(
+                    'max-w-md rounded-lg p-3 text-sm',
+                    message.role === 'user'
+                      ? 'bg-primary text-primary-foreground'
+                      : 'bg-muted'
+                  )}
+                >
+                  <p className="whitespace-pre-wrap">{message.content}</p>
+                </div>
+                {message.role === 'user' && (
+                  <Avatar className="h-8 w-8">
+                    <AvatarFallback><User className="h-5 w-5"/></AvatarFallback>
+                  </Avatar>
+                )}
               </div>
-               {message.role === 'user' && (
-                <Avatar className="h-8 w-8">
-                  <AvatarFallback><User className="h-5 w-5"/></AvatarFallback>
-                </Avatar>
-              )}
-            </div>
-          ))}
-           {loading && (
-            <div className="flex items-start gap-4">
-               <Avatar className="h-8 w-8 bg-primary text-primary-foreground">
-                  <AvatarFallback><Bot className="h-5 w-5"/></AvatarFallback>
-                </Avatar>
-              <div className="max-w-md rounded-lg p-3 bg-muted flex items-center">
-                <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+            ))}
+            {loading && (
+              <div className="flex items-start gap-4">
+                <Avatar className="h-8 w-8 bg-primary text-primary-foreground">
+                    <AvatarFallback><Bot className="h-5 w-5"/></AvatarFallback>
+                  </Avatar>
+                <div className="max-w-md rounded-lg p-3 bg-muted flex items-center">
+                  <Loader2 className="h-5 w-5 animate-spin text-muted-foreground" />
+                </div>
               </div>
-            </div>
-          )}
+            )}
+             <div ref={messagesEndRef} />
+          </div>
         </ScrollArea>
         <div className="p-4 bg-card border-t">
           <form onSubmit={handleSubmit} className="flex gap-2">

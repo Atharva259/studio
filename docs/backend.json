@@ -42,6 +42,29 @@
         "preferredLanguage": {
           "type": "string",
           "description": "Preferred language of the farmer for the app's multilingual support."
+        },
+        "farmPlots": {
+          "type": "array",
+          "description": "An array of plots on the farmer's farm.",
+          "items": {
+            "type": "object",
+            "properties": {
+              "cropName": {
+                "type": "string"
+              },
+              "area": {
+                "type": "string"
+              },
+              "id": {
+                "type": "string"
+              }
+            },
+            "required": [
+              "cropName",
+              "area",
+              "id"
+            ]
+          }
         }
       },
       "required": [

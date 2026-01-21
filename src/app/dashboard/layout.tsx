@@ -17,7 +17,7 @@ import {
   Search,
   Settings,
   Sprout,
-  Store,
+  Users,
   Tractor,
   Loader2,
 } from 'lucide-react';
@@ -67,14 +67,14 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     { href: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
     { href: '/dashboard/my-farm', icon: Home, label: 'My Farm' },
     { href: '/dashboard/crop-planner', icon: Sprout, label: 'Crop Planner' },
-    { href: '/dashboard/marketplace', icon: Store, label: 'Marketplace' },
+    { href: '/dashboard/community-chat', icon: Users, label: 'Community Chat' },
     { href: '/dashboard/tech-hub', icon: Cpu, label: 'Tech Hub' },
     { href: '/dashboard/tour-india', icon: Globe, label: 'Tour India' },
     { href: '/dashboard/chatbot', icon: Bot, label: 'AI Chatbot' },
     { href: 'https://www.google.com/maps/search/?api=1&query=nearby+soil+laboratories', icon: Map, label: 'Nearby Labs', external: true },
   ];
 
-  const NavLink = ({ href, icon: Icon, label, badge }: (typeof navItems)[0]) => (
+  const NavLink = ({ href, icon: Icon, label }: { href: string; icon: React.ElementType; label: string; }) => (
     <Link
       href={href}
       className={cn(
@@ -84,7 +84,6 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     >
       <Icon className="h-4 w-4" />
       {label}
-      {badge && <Badge className="ml-auto flex h-6 w-6 shrink-0 items-center justify-center rounded-full">{badge}</Badge>}
     </Link>
   );
 
@@ -95,7 +94,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
             <Link href="/dashboard" className="flex items-center gap-2 font-semibold">
               <Tractor className="h-6 w-6 text-primary" />
-              <span className="font-headline text-xl font-bold">KisanMate Pro</span>
+              <span className="font-headline text-xl font-bold">KisanMate</span>
             </Link>
             <Button variant="outline" size="icon" className="ml-auto h-8 w-8">
               <Bell className="h-4 w-4" />
@@ -117,7 +116,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
                     {item.label}
                   </a>
                 ) : (
-                  <NavLink key={item.href} {...item} />
+                  <NavLink key={item.href} href={item.href} icon={item.icon} label={item.label} />
                 )
               )}
             </nav>
@@ -137,7 +136,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
               <nav className="grid gap-2 text-lg font-medium">
                 <Link href="/dashboard" className="flex items-center gap-2 text-lg font-semibold mb-4">
                   <Tractor className="h-6 w-6 text-primary" />
-                  <span className="font-headline text-xl">KisanMate Pro</span>
+                  <span className="font-headline text-xl">KisanMate</span>
                 </Link>
                 {navItems.map((item) =>
                   item.external ? (
@@ -210,3 +209,4 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     </div>
   );
 }
+    

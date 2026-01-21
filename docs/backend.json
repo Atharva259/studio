@@ -337,6 +337,41 @@
         "cropsPlanted",
         "plantingDetails"
       ]
+    },
+    "CommunityMessage": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "CommunityMessage",
+      "type": "object",
+      "description": "Represents a message sent in the community chat.",
+      "properties": {
+        "text": {
+          "type": "string",
+          "description": "The content of the chat message."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "The timestamp when the message was sent."
+        },
+        "userId": {
+          "type": "string",
+          "description": "The Firebase Auth UID of the user who sent the message."
+        },
+        "userName": {
+          "type": "string",
+          "description": "The display name of the user who sent the message."
+        },
+        "userPhotoURL": {
+          "type": "string",
+          "description": "The photo URL of the user who sent the message."
+        }
+      },
+      "required": [
+        "text",
+        "createdAt",
+        "userId",
+        "userName"
+      ]
     }
   },
   "auth": {
@@ -462,8 +497,25 @@
             }
           ]
         }
+      },
+      {
+        "path": "/communityChat/{messageId}",
+        "definition": {
+          "entityName": "CommunityMessage",
+          "schema": {
+            "$ref": "#/backend/entities/CommunityMessage"
+          },
+          "description": "Stores messages for the public community chat. Any authenticated user can read and write.",
+          "params": [
+            {
+              "name": "messageId",
+              "description": "The unique identifier for the chat message."
+            }
+          ]
+        }
       }
     ],
-    "reasoning": "The Firestore structure is designed to ensure authorization independence, clarity, and scalability for the KisanMate Pro application. It leverages path-based ownership for user-related data and denormalization to avoid hierarchical authorization dependencies. Segregation is used to manage different data access requirements. The structure promotes secure list operations (QAPs) and maintains data integrity.\n\n*   **Farmers:** Farmers are stored under `/farmers/{farmerId}`. This allows simple, path-based ownership rules for farmer-specific data (CropPlans, Recommendations, Shipments).\n*   **Drivers:** Drivers are stored under `/drivers/{driverId}`. This allows simple, path-based ownership rules for driver-specific data.\n*   **Shipments:** Shipments are stored under `/farmers/{farmerId}/shipments/{shipmentId}`. This establishes clear ownership by the farmer who created the shipment. CostCalculations, linked 1:1 to Shipments, are stored as subcollections for organizational purposes and to scope queries.\n*   **Recommendations & CropPlans:**  Recommendations and CropPlans generated for farmers are stored under `/farmers/{farmerId}/recommendations/{recommendationId}` and `/farmers/{farmerId}/cropPlans/{cropPlanId}` respectively, maintaining path-based ownership.\n\n**Authorization Independence:**\n\nAuthorization independence is achieved by avoiding `get()` calls in security rules. For example, shipments are located under the farmer's document, establishing ownership via the path. This avoids needing to read the farmer document to authorize shipment access. Similarly, cost calculations, recommendations, and crop plans are all located under the farmer's document.\n\n**QAPs (Rules are not Filters):**\n\nThe structure enables secure `list` operations by segregating data and using path-based ownership. Listing shipments is scoped to a farmer (`/farmers/{farmerId}/shipments`), preventing unauthorized access to other farmers' shipments. There's no need to filter based on farmer ID in the rules, as the path inherently provides that context. This applies equally to recommendations and crop plans."
+    "reasoning": "The Firestore structure is designed to ensure authorization independence, clarity, and scalability for the KisanMate Pro application. It leverages path-based ownership for user-related data and denormalization to avoid hierarchical authorization dependencies. Segregation is used to manage different data access requirements. The structure promotes secure list operations (QAPs) and maintains data integrity.\n\n*   **Farmers:** Farmers are stored under `/farmers/{farmerId}`. This allows simple, path-based ownership rules for farmer-specific data (CropPlans, Recommendations, Shipments).\n*   **Drivers:** Drivers are stored under `/drivers/{driverId}`. This allows simple, path-based ownership rules for driver-specific data.\n*   **Shipments:** Shipments are stored under `/farmers/{farmerId}/shipments/{shipmentId}`. This establishes clear ownership by the farmer who created the shipment. CostCalculations, linked 1:1 to Shipments, are stored as subcollections for organizational purposes and to scope queries.\n*   **Recommendations & CropPlans:**  Recommendations and CropPlans generated for farmers are stored under `/farmers/{farmerId}/recommendations/{recommendationId}` and `/farmers/{farmerId}/cropPlans/{cropPlanId}` respectively, maintaining path-based ownership.\n*   **Community Chat:** Messages are stored in a top-level `/communityChat` collection. This is a public space where all authenticated users can read and write, fostering community interaction without complex relationship management.\n\n**Authorization Independence:**\n\nAuthorization independence is achieved by avoiding `get()` calls in security rules. For example, shipments are located under the farmer's document, establishing ownership via the path. This avoids needing to read the farmer document to authorize shipment access. Similarly, cost calculations, recommendations, and crop plans are all located under the farmer's document.\n\n**QAPs (Rules are not Filters):**\n\nThe structure enables secure `list` operations by segregating data and using path-based ownership. Listing shipments is scoped to a farmer (`/farmers/{farmerId}/shipments`), preventing unauthorized access to other farmers' shipments. There's no need to filter based on farmer ID in the rules, as the path inherently provides that context. This applies equally to recommendations and crop plans."
   }
 }
+    

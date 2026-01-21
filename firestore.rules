@@ -9,7 +9,8 @@
  * The data is organized into two main top-level collections: `/farmers` and `/drivers`.
  * Farmer-specific data is stored in subcollections under `/farmers/{farmerId}`. This
  * path-based ownership is the primary mechanism for securing user data, making rules
- * simple and performant.
+ * simple and performant. There is also a top-level `/communityChat` collection for
+ * public messages.
  *
  * Key Security Decisions:
  * - User Profiles: Users can create their own profile document in either `/farmers` or
@@ -22,6 +23,9 @@
  *   by the assigned Driver. This is accomplished by denormalizing the `driverId` onto
  *   the shipment document. The Driver has read-only access, while the Farmer retains
  *   full control.
+ * - Public Chat: All authenticated users can read and write to the `/communityChat`
+ *   collection, but they can only create messages as themselves and cannot edit or
+ *   delete messages.
  * - No User Listing: To protect user privacy and prevent data scraping, listing the
  *   top-level `/farmers` or `/drivers` collections is explicitly disallowed.
  *
@@ -181,5 +185,20 @@ service cloud.firestore {
       allow update: if isExistingOwner(farmerId) && existingOwnedDataIsValid();
       allow delete: if isExistingOwner(farmerId);
     }
+
+    /**
+     * @description Controls access to the global community chat.
+     * @path /communityChat/{messageId}
+     * @allow Any signed-in user can (list) and (get) messages.
+     * @allow Any signed-in user can (create) a message, but they must be the author.
+     * @deny Updates and deletes are disallowed to maintain chat history.
+     * @principle Provides a public forum for authenticated users while ensuring message integrity.
+     */
+    match /communityChat/{messageId} {
+      allow get, list: if isSignedIn();
+      allow create: if isSignedIn() && request.resource.data.userId == request.auth.uid;
+      allow update, delete: if false;
+    }
   }
 }
+    

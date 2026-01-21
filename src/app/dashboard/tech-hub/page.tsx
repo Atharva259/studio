@@ -8,7 +8,7 @@ const technologies = [
     {
         title: "Agricultural Drones",
         description: "Enhance crop monitoring, spraying, and health assessment with high-precision aerial data. Drones help in early detection of pests and nutrient deficiencies, optimizing input usage.",
-        company: "AeroSeed Technologies",
+        company: "VAIMANIKA® AERO SPACE",
         image: PlaceHolderImages.find((img) => img.id === 'tech-drone'),
     },
     {

@@ -1,0 +1,185 @@
+/**
+ * Core Philosophy:
+ * This ruleset enforces a strict user-ownership model for a multi-role application
+ * involving "Farmers" and "Drivers". Each user type has their own profile document,
+ * and all farmer-specific data (like shipments, recommendations, and crop plans)
+ * is nested within that farmer's data tree, ensuring data isolation and security.
+ *
+ * Data Structure:
+ * The data is organized into two main top-level collections: `/farmers` and `/drivers`.
+ * Farmer-specific data is stored in subcollections under `/farmers/{farmerId}`. This
+ * path-based ownership is the primary mechanism for securing user data, making rules
+ * simple and performant.
+ *
+ * Key Security Decisions:
+ * - User Profiles: Users can create their own profile document in either `/farmers` or
+ *   `/drivers`, but only if the document ID matches their authentication UID. They can
+ *   only read or modify their own profile.
+ * - Strict Ownership: All data in subcollections under `/farmers/{farmerId}` is
+ *   strictly owned by that farmer. They have full create, read, update, and delete
+ *   permissions on their own data.
+ * - Shared Shipment Access: A `Shipment` document, owned by a Farmer, can be read
+ *   by the assigned Driver. This is accomplished by denormalizing the `driverId` onto
+ *   the shipment document. The Driver has read-only access, while the Farmer retains
+ *   full control.
+ * - No User Listing: To protect user privacy and prevent data scraping, listing the
+ *   top-level `/farmers` or `/drivers` collections is explicitly disallowed.
+ *
+ * Denormalization for Authorization:
+ * This ruleset relies on denormalization for efficient authorization. For example, a
+ * shipment document under `/farmers/{farmerId}/shipments/{shipmentId}` has a `driverId`
+ * field. This allows a simple rule to grant the assigned driver read access without
+ * needing a costly `get()` or an impossible query on another collection. Path-based
+ * ownership (`/farmers/{farmerId}/...`) is the primary denormalization strategy, as the
+ * owner's ID is part of the path itself.
+ *
+ * Structural Segregation:
+ * The separation of `/farmers` and `/drivers` into distinct top-level collections
+ * provides clear structural segregation for different user roles and their associated
+ * data, simplifying security logic.
+ */
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Helper functions for reusable logic
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isExistingOwner(userId) {
+      return isOwner(userId) && resource != null;
+    }
+
+    // On create, ensures the document's internal auth ID matches the creator's auth ID.
+    function newProfileDataIsValid(userId) {
+      return request.resource.data.firebaseAuthId == userId;
+    }
+
+    // On update, ensures the internal auth ID is immutable.
+    function existingProfileDataIsValid() {
+      return request.resource.data.firebaseAuthId == resource.data.firebaseAuthId;
+    }
+
+    // On create, ensures a subcollection document's owner ID matches the path.
+    function newOwnedDataIsValid(ownerId) {
+      return request.resource.data.farmerId == ownerId;
+    }
+
+    // On update, ensures the owner ID of a subcollection document is immutable.
+    function existingOwnedDataIsValid() {
+      return request.resource.data.farmerId == resource.data.farmerId;
+    }
+
+    // Grants read access to a shipment if the user is the owner (Farmer)
+    // or the assigned Driver.
+    function canReadShipment(farmerId) {
+      return isOwner(farmerId) || (isSignedIn() && request.auth.uid == resource.data.driverId);
+    }
+    
+    // Grants read access to a shipment subcollection by checking the parent shipment.
+    function canReadShipmentSubcollection(farmerId, shipmentId) {
+      let shipment = get(/databases/$(database)/documents/farmers/$(farmerId)/shipments/$(shipmentId));
+      return isOwner(farmerId) || (isSignedIn() && request.auth.uid == shipment.data.driverId);
+    }
+
+    /**
+     * @description Controls access to Farmer profile documents.
+     * @path /farmers/{farmerId}
+     * @allow A signed-in user (create)s their own profile document where `farmerId` matches their UID.
+     * @deny An anonymous user tries to read any farmer's profile.
+     * @deny A signed-in user tries to (list) all farmers.
+     * @principle Enforces self-creation and ownership of user profiles. Prevents user enumeration.
+     */
+    match /farmers/{farmerId} {
+      allow get: if isOwner(farmerId);
+      allow list: if false;
+      allow create: if isOwner(farmerId) && newProfileDataIsValid(farmerId);
+      allow update: if isExistingOwner(farmerId) && existingProfileDataIsValid();
+      allow delete: if isExistingOwner(farmerId);
+    }
+
+    /**
+     * @description Controls access to Driver profile documents.
+     * @path /drivers/{driverId}
+     * @allow A signed-in user (update)s their own profile document.
+     * @deny A signed-in user tries to (delete) another driver's profile.
+     * @deny A signed-in user tries to (list) all drivers.
+     * @principle Enforces self-creation and ownership of user profiles. Prevents user enumeration.
+     */
+    match /drivers/{driverId} {
+      allow get: if isOwner(driverId);
+      allow list: if false;
+      allow create: if isOwner(driverId) && newProfileDataIsValid(driverId);
+      allow update: if isExistingOwner(driverId) && existingProfileDataIsValid();
+      allow delete: if isExistingOwner(driverId);
+    }
+
+    /**
+     * @description Manages shipments, owned by farmers and readable by assigned drivers.
+     * @path /farmers/{farmerId}/shipments/{shipmentId}
+     * @allow A farmer (create)s a new shipment for themselves.
+     * @allow An assigned driver (get)s the shipment details they are assigned to.
+     * @deny A driver tries to (update) a shipment, even if they are assigned to it.
+     * @deny A farmer tries to (list) another farmer's shipments.
+     * @principle Enforces document ownership for writes, with role-based read access for collaborators (drivers).
+     */
+    match /farmers/{farmerId}/shipments/{shipmentId} {
+      allow get: if canReadShipment(farmerId);
+      allow list: if isOwner(farmerId);
+      allow create: if isOwner(farmerId) && newOwnedDataIsValid(farmerId);
+      allow update: if isExistingOwner(farmerId) && existingOwnedDataIsValid();
+      allow delete: if isExistingOwner(farmerId);
+    }
+
+    /**
+     * @description Secures cost calculation data, which inherits access from its parent shipment.
+     * @path /farmers/{farmerId}/shipments/{shipmentId}/costCalculations/{costCalculationId}
+     * @allow The farmer who owns the shipment (get)s its cost calculation details.
+     * @allow The driver assigned to the shipment (list)s its cost calculations.
+     * @deny A driver tries to (create) a cost calculation for a shipment.
+     * @deny An unauthenticated user tries to read any cost calculation data.
+     * @principle Secures a subcollection by checking permissions on the parent document.
+     */
+    match /farmers/{farmerId}/shipments/{shipmentId}/costCalculations/{costCalculationId} {
+      allow get, list: if canReadShipmentSubcollection(farmerId, shipmentId);
+      allow create: if isOwner(farmerId);
+      allow update: if isExistingOwner(farmerId);
+      allow delete: if isExistingOwner(farmerId);
+    }
+
+    /**
+     * @description Manages AI-generated recommendations, private to each farmer.
+     * @path /farmers/{farmerId}/recommendations/{recommendationId}
+     * @allow A farmer (list)s all of their own recommendations.
+     * @allow A farmer (delete)s one of their old recommendations.
+     * @deny A farmer tries to read or write recommendations belonging to another farmer.
+     * @principle Restricts access to a user's own private data tree using path-based ownership.
+     */
+    match /farmers/{farmerId}/recommendations/{recommendationId} {
+      allow get, list: if isOwner(farmerId);
+      allow create: if isOwner(farmerId) && newOwnedDataIsValid(farmerId);
+      allow update: if isExistingOwner(farmerId) && existingOwnedDataIsValid();
+      allow delete: if isExistingOwner(farmerId);
+    }
+
+    /**
+     * @description Manages AI-generated crop plans, private to each farmer.
+     * @path /farmers/{farmerId}/cropPlans/{cropPlanId}
+     * @allow A farmer (create)s a new crop plan for their farm.
+     * @allow A farmer (get)s the details of one of their existing crop plans.
+     * @deny Any user, including other farmers, tries to access another farmer's crop plans.
+     * @principle Restricts access to a user's own private data tree using path-based ownership.
+     */
+    match /farmers/{farmerId}/cropPlans/{cropPlanId} {
+      allow get, list: if isOwner(farmerId);
+      allow create: if isOwner(farmerId) && newOwnedDataIsValid(farmerId);
+      allow update: if isExistingOwner(farmerId) && existingOwnedDataIsValid();
+      allow delete: if isExistingOwner(farmerId);
+    }
+  }
+}

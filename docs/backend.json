@@ -1,0 +1,446 @@
+{
+  "entities": {
+    "Farmer": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Farmer",
+      "type": "object",
+      "description": "Represents a farmer using the KisanMate Pro app.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Farmer entity."
+        },
+        "firebaseAuthId": {
+          "type": "string",
+          "description": "ID from Firebase Authentication, linking the farmer to their authentication profile."
+        },
+        "firstName": {
+          "type": "string",
+          "description": "First name of the farmer."
+        },
+        "lastName": {
+          "type": "string",
+          "description": "Last name of the farmer."
+        },
+        "contactNumber": {
+          "type": "string",
+          "description": "Phone number of the farmer."
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address of the farmer.",
+          "format": "email"
+        },
+        "address": {
+          "type": "string",
+          "description": "Address of the farmer."
+        },
+        "farmLocation": {
+          "type": "string",
+          "description": "Location of the farmer's farm (e.g., coordinates or address)."
+        },
+        "preferredLanguage": {
+          "type": "string",
+          "description": "Preferred language of the farmer for the app's multilingual support."
+        }
+      },
+      "required": [
+        "id",
+        "firebaseAuthId",
+        "firstName",
+        "lastName",
+        "contactNumber",
+        "email",
+        "address",
+        "farmLocation",
+        "preferredLanguage"
+      ]
+    },
+    "Driver": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Driver",
+      "type": "object",
+      "description": "Represents a driver who transports shipments for farmers.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Driver entity."
+        },
+        "firebaseAuthId": {
+          "type": "string",
+          "description": "ID from Firebase Authentication, linking the driver to their authentication profile."
+        },
+        "firstName": {
+          "type": "string",
+          "description": "First name of the driver."
+        },
+        "lastName": {
+          "type": "string",
+          "description": "Last name of the driver."
+        },
+        "contactNumber": {
+          "type": "string",
+          "description": "Phone number of the driver."
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address of the driver.",
+          "format": "email"
+        },
+        "vehicleType": {
+          "type": "string",
+          "description": "Type of vehicle the driver uses (e.g., truck, van)."
+        },
+        "vehicleCapacity": {
+          "type": "number",
+          "description": "Maximum load capacity of the driver's vehicle (e.g., in kilograms)."
+        },
+        "availability": {
+          "type": "boolean",
+          "description": "Indicates whether the driver is currently available for shipments."
+        },
+        "location": {
+          "type": "string",
+          "description": "Current location of the driver (e.g., coordinates)."
+        },
+        "rating": {
+          "type": "number",
+          "description": "Driver's rating (e.g., average rating from previous shipments)."
+        }
+      },
+      "required": [
+        "id",
+        "firebaseAuthId",
+        "firstName",
+        "lastName",
+        "contactNumber",
+        "email",
+        "vehicleType",
+        "vehicleCapacity",
+        "availability",
+        "location",
+        "rating"
+      ]
+    },
+    "Shipment": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Shipment",
+      "type": "object",
+      "description": "Represents a shipment of produce from a farmer to a destination.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Shipment entity."
+        },
+        "farmerId": {
+          "type": "string",
+          "description": "Reference to the Farmer who created the shipment. (Relationship: Farmer 1:N Shipment)"
+        },
+        "driverId": {
+          "type": "string",
+          "description": "Reference to the Driver assigned to the shipment. (Relationship: Driver 1:N Shipment). Null if not yet assigned."
+        },
+        "produceType": {
+          "type": "string",
+          "description": "Type of produce being shipped (e.g., wheat, rice, vegetables)."
+        },
+        "weight": {
+          "type": "number",
+          "description": "Weight of the shipment (e.g., in kilograms)."
+        },
+        "pickupLocation": {
+          "type": "string",
+          "description": "Pickup location of the shipment (e.g., farm address)."
+        },
+        "deliveryLocation": {
+          "type": "string",
+          "description": "Delivery location of the shipment."
+        },
+        "shipmentDate": {
+          "type": "string",
+          "description": "Date the shipment was created.",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "string",
+          "description": "Current status of the shipment (e.g., pending, in transit, delivered)."
+        },
+        "cost": {
+          "type": "number",
+          "description": "The final calculated cost of the shipment."
+        }
+      },
+      "required": [
+        "id",
+        "farmerId",
+        "produceType",
+        "weight",
+        "pickupLocation",
+        "deliveryLocation",
+        "shipmentDate",
+        "status"
+      ]
+    },
+    "CostCalculation": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "CostCalculation",
+      "type": "object",
+      "description": "Represents the calculation details for a shipment's cost.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the CostCalculation entity."
+        },
+        "shipmentId": {
+          "type": "string",
+          "description": "Reference to the Shipment this cost calculation is for. (Relationship: Shipment 1:1 CostCalculation)"
+        },
+        "baseCost": {
+          "type": "number",
+          "description": "Base cost of the shipment (e.g., a fixed fee)."
+        },
+        "distanceCost": {
+          "type": "number",
+          "description": "Cost based on the distance of the shipment."
+        },
+        "weightCost": {
+          "type": "number",
+          "description": "Cost based on the weight of the shipment."
+        },
+        "coldChainCost": {
+          "type": "number",
+          "description": "Additional cost for maintaining a cold chain (if required)."
+        },
+        "fees": {
+          "type": "number",
+          "description": "Any additional fees applied to the shipment."
+        },
+        "taxes": {
+          "type": "number",
+          "description": "Taxes applied to the shipment."
+        },
+        "totalCost": {
+          "type": "number",
+          "description": "The total cost of the shipment after all calculations."
+        }
+      },
+      "required": [
+        "id",
+        "shipmentId",
+        "baseCost",
+        "distanceCost",
+        "weightCost",
+        "fees",
+        "taxes",
+        "totalCost"
+      ]
+    },
+    "Recommendation": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Recommendation",
+      "type": "object",
+      "description": "Represents a recommendation provided to a farmer based on their data.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Recommendation entity."
+        },
+        "farmerId": {
+          "type": "string",
+          "description": "Reference to the Farmer who received the recommendation. (Relationship: Farmer 1:N Recommendation)"
+        },
+        "recommendationType": {
+          "type": "string",
+          "description": "Type of recommendation (e.g., market suggestion, storage tip, pricing tip)."
+        },
+        "content": {
+          "type": "string",
+          "description": "The content of the recommendation message."
+        },
+        "dateCreated": {
+          "type": "string",
+          "description": "Date the recommendation was generated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "farmerId",
+        "recommendationType",
+        "content",
+        "dateCreated"
+      ]
+    },
+    "CropPlan": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "CropPlan",
+      "type": "object",
+      "description": "Represents a crop planting plan generated by the AI for a farmer.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the CropPlan entity."
+        },
+        "farmerId": {
+          "type": "string",
+          "description": "Reference to the Farmer the crop plan is for. (Relationship: Farmer 1:N CropPlan)"
+        },
+        "planName": {
+          "type": "string",
+          "description": "Name of the crop plan (e.g., Spring 2024 Plan)."
+        },
+        "dateCreated": {
+          "type": "string",
+          "description": "Date the crop plan was generated.",
+          "format": "date-time"
+        },
+        "cropsPlanted": {
+          "type": "array",
+          "description": "Array of crops included in the plan",
+          "items": {
+            "type": "string"
+          }
+        },
+        "plantingDetails": {
+          "type": "string",
+          "description": "Detailed planting instructions (e.g., area allocation, spacing)."
+        }
+      },
+      "required": [
+        "id",
+        "farmerId",
+        "planName",
+        "dateCreated",
+        "cropsPlanted",
+        "plantingDetails"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/farmers/{farmerId}",
+        "definition": {
+          "entityName": "Farmer",
+          "schema": {
+            "$ref": "#/backend/entities/Farmer"
+          },
+          "description": "Stores farmer profiles.  The 'farmerId' is used for path-based ownership in subcollections.",
+          "params": [
+            {
+              "name": "farmerId",
+              "description": "The unique identifier for the farmer."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/drivers/{driverId}",
+        "definition": {
+          "entityName": "Driver",
+          "schema": {
+            "$ref": "#/backend/entities/Driver"
+          },
+          "description": "Stores driver profiles.",
+          "params": [
+            {
+              "name": "driverId",
+              "description": "The unique identifier for the driver."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/farmers/{farmerId}/shipments/{shipmentId}",
+        "definition": {
+          "entityName": "Shipment",
+          "schema": {
+            "$ref": "#/backend/entities/Shipment"
+          },
+          "description": "Stores shipment details for each farmer. Uses path-based ownership via the farmerId.",
+          "params": [
+            {
+              "name": "farmerId",
+              "description": "The unique identifier for the farmer who owns the shipment."
+            },
+            {
+              "name": "shipmentId",
+              "description": "The unique identifier for the shipment."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/farmers/{farmerId}/shipments/{shipmentId}/costCalculations/{costCalculationId}",
+        "definition": {
+          "entityName": "CostCalculation",
+          "schema": {
+            "$ref": "#/backend/entities/CostCalculation"
+          },
+          "description": "Stores cost calculation details for a specific shipment. Scoped under shipment for easy access and querying.",
+          "params": [
+            {
+              "name": "farmerId",
+              "description": "The unique identifier for the farmer who owns the shipment."
+            },
+            {
+              "name": "shipmentId",
+              "description": "The unique identifier for the shipment."
+            },
+            {
+              "name": "costCalculationId",
+              "description": "The unique identifier for the cost calculation."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/farmers/{farmerId}/recommendations/{recommendationId}",
+        "definition": {
+          "entityName": "Recommendation",
+          "schema": {
+            "$ref": "#/backend/entities/Recommendation"
+          },
+          "description": "Stores AI recommendations for a farmer. Uses path-based ownership.",
+          "params": [
+            {
+              "name": "farmerId",
+              "description": "The unique identifier for the farmer who receives the recommendation."
+            },
+            {
+              "name": "recommendationId",
+              "description": "The unique identifier for the recommendation."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/farmers/{farmerId}/cropPlans/{cropPlanId}",
+        "definition": {
+          "entityName": "CropPlan",
+          "schema": {
+            "$ref": "#/backend/entities/CropPlan"
+          },
+          "description": "Stores crop plans generated for a farmer by the AI. Uses path-based ownership.",
+          "params": [
+            {
+              "name": "farmerId",
+              "description": "The unique identifier for the farmer who owns the crop plan."
+            },
+            {
+              "name": "cropPlanId",
+              "description": "The unique identifier for the crop plan."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure is designed to ensure authorization independence, clarity, and scalability for the KisanMate Pro application. It leverages path-based ownership for user-related data and denormalization to avoid hierarchical authorization dependencies. Segregation is used to manage different data access requirements. The structure promotes secure list operations (QAPs) and maintains data integrity.\n\n*   **Farmers:** Farmers are stored under `/farmers/{farmerId}`. This allows simple, path-based ownership rules for farmer-specific data (CropPlans, Recommendations, Shipments).\n*   **Drivers:** Drivers are stored under `/drivers/{driverId}`. This allows simple, path-based ownership rules for driver-specific data.\n*   **Shipments:** Shipments are stored under `/farmers/{farmerId}/shipments/{shipmentId}`. This establishes clear ownership by the farmer who created the shipment. CostCalculations, linked 1:1 to Shipments, are stored as subcollections for organizational purposes and to scope queries.\n*   **Recommendations & CropPlans:**  Recommendations and CropPlans generated for farmers are stored under `/farmers/{farmerId}/recommendations/{recommendationId}` and `/farmers/{farmerId}/cropPlans/{cropPlanId}` respectively, maintaining path-based ownership.\n\n**Authorization Independence:**\n\nAuthorization independence is achieved by avoiding `get()` calls in security rules. For example, shipments are located under the farmer's document, establishing ownership via the path. This avoids needing to read the farmer document to authorize shipment access. Similarly, cost calculations, recommendations, and crop plans are all located under the farmer's document.\n\n**QAPs (Rules are not Filters):**\n\nThe structure enables secure `list` operations by segregating data and using path-based ownership. Listing shipments is scoped to a farmer (`/farmers/{farmerId}/shipments`), preventing unauthorized access to other farmers' shipments. There's no need to filter based on farmer ID in the rules, as the path inherently provides that context. This applies equally to recommendations and crop plans."
+  }
+}

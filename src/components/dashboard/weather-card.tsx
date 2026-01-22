@@ -13,10 +13,6 @@ interface WeatherData {
   humidity: number;
   windSpeed: number;
   locationName: string;
-  alert?: {
-    title: string;
-    message: string;
-  };
 }
 
 export function WeatherCard() {
@@ -36,9 +32,8 @@ export function WeatherCard() {
 
     const fetchWeatherData = async (lat: number, lon: number) => {
         // In a real app, you would use a weather API here.
-        // For demonstration, we'll use mock data and simulate a cyclone alert.
-        console.log(`Fetching weather for Lat: ${lat}, Lon: ${lon}`);
-
+        // For demonstration, we'll use mock data.
+        
         // This is a placeholder. You would replace this with a call to a reverse geocoding API
         // to get the location name from coordinates.
         const locationName = "Your Location";
@@ -50,10 +45,6 @@ export function WeatherCard() {
             humidity: 45,
             windSpeed: 12,
             locationName: locationName,
-            alert: {
-                title: "Cyclone Alert",
-                message: "Cyclone 'Vayu' is approaching. Expected landfall in 48 hours. Secure equipment and prepare for heavy rain.",
-            }
         };
 
         setWeather(mockWeather);
@@ -96,7 +87,7 @@ export function WeatherCard() {
   return (
     <Card className="col-span-1 lg:col-span-1">
       <CardHeader>
-        <CardTitle>Weather & Alerts</CardTitle>
+        <CardTitle>Weather</CardTitle>
         <CardDescription>{loading ? "Fetching your location..." : error ? "Could not fetch weather" : `Current conditions for ${weather?.locationName}`}</CardDescription>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -118,15 +109,6 @@ export function WeatherCard() {
 
         {weather && !loading && !error && (
             <>
-                {weather.alert && (
-                <div className="p-3 rounded-lg bg-destructive/10 text-destructive border border-destructive/20 flex items-start gap-3">
-                    <AlertCircle className="h-5 w-5 mt-0.5 shrink-0" />
-                    <div>
-                    <h4 className="font-bold">{weather.alert.title}</h4>
-                    <p className="text-sm">{weather.alert.message}</p>
-                    </div>
-                </div>
-                )}
                 <div className="flex justify-around text-center p-4 rounded-lg bg-muted/50">
                     <div className="flex flex-col items-center gap-1">
                         <Sun className="h-8 w-8 text-accent"/>

@@ -13,7 +13,20 @@ interface WeatherData {
   humidity: number;
   windSpeed: number;
   locationName: string;
+  icon: React.ReactNode;
 }
+
+const getWeatherInfo = (code: number): { condition: string; icon: React.ReactNode } => {
+  if (code === 0) return { condition: 'Clear', icon: <Sun className="h-8 w-8 text-accent"/> };
+  if ([1, 2, 3].includes(code)) return { condition: 'Cloudy', icon: <Sun className="h-8 w-8 text-accent"/> };
+  if ([45, 48].includes(code)) return { condition: 'Fog', icon: <CloudDrizzle className="h-8 w-8 text-primary"/> };
+  if (code >= 51 && code <= 67) return { condition: 'Rain', icon: <CloudDrizzle className="h-8 w-8 text-primary"/> };
+  if (code >= 80 && code <= 82) return { condition: 'Showers', icon: <CloudDrizzle className="h-8 w-8 text-primary"/> };
+  if (code >= 95) return { condition: 'Thunderstorm', icon: <CloudDrizzle className="h-8 w-8 text-primary"/> };
+  
+  return { condition: "Cloudy", icon: <Sun className="h-8 w-8 text-accent" /> };
+}
+
 
 export function WeatherCard() {
   const mapImage = PlaceHolderImages.find((img) => img.id === 'weather-map');
@@ -31,24 +44,43 @@ export function WeatherCard() {
     }
 
     const fetchWeatherData = async (lat: number, lon: number) => {
-        // In a real app, you would use a weather API here.
-        // For demonstration, we'll use mock data.
-        
-        // This is a placeholder. You would replace this with a call to a reverse geocoding API
-        // to get the location name from coordinates.
-        const locationName = "Your Location";
+        try {
+            const weatherResponse = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,weather_code,wind_speed_10m&wind_speed_unit=kmh`);
+            if (!weatherResponse.ok) {
+                throw new Error("Failed to fetch weather data.");
+            }
+            const weatherData = await weatherResponse.json();
 
-        // Mock data
-        const mockWeather: WeatherData = {
-            temp: 32,
-            condition: "Sunny",
-            humidity: 45,
-            windSpeed: 12,
-            locationName: locationName,
-        };
+            const locationResponse = await fetch(`https://geocoding-api.open-meteo.com/v1/reverse?latitude=${lat}&longitude=${lon}`);
+            if(!locationResponse.ok) {
+                throw new Error("Failed to fetch location data.");
+            }
+            const locationData = await locationResponse.json();
+            
+            const locationName = locationData.results?.[0]?.name ? `${locationData.results[0].name}, ${locationData.results[0].country_code}` : "Your Location";
+            
+            const { condition, icon } = getWeatherInfo(weatherData.current.weather_code);
 
-        setWeather(mockWeather);
-        setLoading(false);
+            setWeather({
+                temp: Math.round(weatherData.current.temperature_2m),
+                condition: condition,
+                humidity: weatherData.current.relative_humidity_2m,
+                windSpeed: Math.round(weatherData.current.wind_speed_10m),
+                locationName: locationName,
+                icon: icon,
+            });
+
+        } catch (err: any) {
+            console.error("Weather fetch error:", err);
+            setError("Could not retrieve weather information.");
+            toast({
+                title: "Weather Error",
+                description: "Could not retrieve weather information.",
+                variant: "destructive"
+            });
+        } finally {
+            setLoading(false);
+        }
     }
 
     const handleLocationError = (error: GeolocationPositionError) => {
@@ -111,7 +143,7 @@ export function WeatherCard() {
             <>
                 <div className="flex justify-around text-center p-4 rounded-lg bg-muted/50">
                     <div className="flex flex-col items-center gap-1">
-                        <Sun className="h-8 w-8 text-accent"/>
+                        {weather.icon}
                         <span className="font-bold text-lg">{weather.temp}°C</span>
                         <span className="text-xs text-muted-foreground">{weather.condition}</span>
                     </div>

@@ -17,11 +17,6 @@ export default function Dashboard() {
           <h1 className="text-2xl md:text-3xl font-headline font-bold text-primary">Dashboard</h1>
           <p className="text-muted-foreground">Welcome back, here&apos;s your farm&apos;s overview.</p>
         </div>
-        <Button asChild>
-          <Link href="/dashboard/shipments">
-            Create Shipment <ArrowUpRight className="ml-2 h-4 w-4" />
-          </Link>
-        </Button>
       </div>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         <InteractiveFarm />

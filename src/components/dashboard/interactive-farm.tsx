@@ -3,10 +3,22 @@
 import Link from 'next/link';
 import { doc } from 'firebase/firestore';
 import { Loader2, Sprout } from 'lucide-react';
-
+import dynamic from "next/dynamic";
 import { useUser, useFirestore, useDoc, useMemoFirebase } from '@/firebase';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+
+const Sprout = dynamic(() =>
+  import("lucide-react").then((mod) => mod.Sprout)
+);
+
+if (isUserLoading) {
+  return (
+    <div className="flex items-center justify-center h-[200px]">
+      <Loader2 className="h-8 w-8 animate-spin text-primary" />
+    </div>
+  );
+}
 
 interface FarmPlot {
   id: string;
@@ -29,7 +41,7 @@ export function InteractiveFarm() {
 
   const { data: farmerData, isLoading: isFarmerDataLoading } = useDoc<FarmerProfile>(farmerDocRef);
 
-  const plots = farmerData?.farmPlots || [];
+  const plots = (farmerData?.farmPlots || []).slice(0, 12);
   const isLoading = isUserLoading || isFarmerDataLoading;
 
   return (
@@ -50,7 +62,7 @@ export function InteractiveFarm() {
             <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
               <div className="md:col-span-3 aspect-[4/3] rounded-lg p-4 bg-muted/50 flex flex-wrap gap-2 content-start">
                 {plots.map((plot) => (
-                    <div key={plot.id} className="bg-primary/20 rounded-md flex flex-col items-center justify-center text-xs text-center font-bold text-primary-foreground shadow-inner p-2 flex-grow transition-all hover:scale-105 cursor-pointer basis-1/4">
+                    <div key={plot.id} className="bg-primary/20 rounded-md flex flex-col items-center justify-center text-xs text-center font-bold text-primary-foreground shadow-inner p-2 flex-grow transition-all  cursor-hover:bg-primary/30 pointer basis-1/4">
                         <p>{plot.cropName}</p>
                         <p className="font-normal opacity-75">{plot.area}</p>
                     </div>
